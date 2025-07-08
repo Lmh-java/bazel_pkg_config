@@ -176,7 +176,7 @@ def _pkg_config_impl(ctx):
         "%{include_prefix}": include_prefix,
     }, executable = False)
 
-pkg_config_repository = repository_rule(
+_pkg_config_repository = repository_rule(
     attrs = {
         "pkg_name": attr.string(doc = "Package name for pkg-config query, default to name."),
         "include_prefix": attr.string(doc = "Additional prefix when including file, e.g. third_party. Compatible with strip_include option to produce desired include paths."),
@@ -192,6 +192,9 @@ pkg_config_repository = repository_rule(
     local = True,
     implementation = _pkg_config_impl,
 )
+
+# Maintain backward compatibility for WORKSPACE usage
+pkg_config_repository = _pkg_config_repository
 
 def _pkg_config_extension_impl(module_ctx):
     for module in module_ctx.modules:
