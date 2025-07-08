@@ -95,7 +95,8 @@ def _symlinks(ctx, basename, srcpaths):
     rootlen = len(str(base)) - len(basename)
     for src in [ctx.path(p) for p in srcpaths]:
         dest = base.get_child(src.basename)
-        ctx.symlink(src, dest)
+        if not dest.exists:
+            ctx.symlink(src, dest)
         result += [str(dest)[rootlen:]]
     return result
 
