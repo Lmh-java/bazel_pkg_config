@@ -26,6 +26,7 @@ def _pkg_config(ctx, pkg_config, pkg_name, args):
 
 def _check(ctx, pkg_config, pkg_name):
     exist = _pkg_config(ctx, pkg_config, pkg_name, ["--exists"])
+    print(exist)
     if exist.error != None:
         return _error("Package {} does not exist".format(pkg_name))
 
@@ -63,6 +64,7 @@ def _includes(ctx, pkg_config, pkg_name):
     if includes.error != None:
         return includes
     includes, unused = _extract_prefix(includes.value, "-I", strip = True)
+    print("Get all the includes")
     return _success(includes)
 
 def _copts(ctx, pkg_config, pkg_name):
@@ -176,7 +178,7 @@ def _pkg_config_impl(ctx):
         "%{include_prefix}": include_prefix,
     }, executable = False)
 
-pkg_config = repository_rule(
+_pkg_config_repository = repository_rule(
     attrs = {
         "pkg_name": attr.string(doc = "Package name for pkg-config query, default to name."),
         "include_prefix": attr.string(doc = "Additional prefix when including file, e.g. third_party. Compatible with strip_include option to produce desired include paths."),
@@ -191,4 +193,45 @@ pkg_config = repository_rule(
     },
     local = True,
     implementation = _pkg_config_impl,
+)
+
+# Maintain backward compatibility for WORKSPACE usage
+pkg_config_repository = _pkg_config_repository
+
+def _pkg_config_extension_impl(module_ctx):
+    for module in module_ctx.modules:
+        print("module")
+        for tag in module.tags.package:
+            print("tag")
+            _pkg_config_repository(
+                name = tag.name,
+                pkg_name = tag.pkg_name,
+                include_prefix = tag.include_prefix,
+                strip_include = tag.strip_include,
+                version = tag.version,
+                min_version = tag.min_version,
+                max_version = tag.max_version,
+                deps = tag.deps,
+                linkopts = tag.linkopts,
+                copts = tag.copts,
+                ignore_opts = tag.ignore_opts,
+            )
+
+pkg_config_extension = module_extension(
+    implementation = _pkg_config_extension_impl,
+    tag_classes = {
+        "package": tag_class(attrs = {
+            "name": attr.string(mandatory = True),
+            "pkg_name": attr.string(default = ""),
+            "include_prefix": attr.string(default = ""),
+            "strip_include": attr.string(default = ""),
+            "version": attr.string(default = ""),
+            "min_version": attr.string(default = ""),
+            "max_version": attr.string(default = ""),
+            "deps": attr.string_list(default = []),
+            "linkopts": attr.string_list(default = []),
+            "copts": attr.string_list(default = []),
+            "ignore_opts": attr.string_list(default = []),
+        }),
+    }
 )
