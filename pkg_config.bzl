@@ -120,7 +120,29 @@ def _fmt_array(array):
 def _fmt_glob(array):
     return _fmt_array(["{}/**/*.h".format(a) for a in array])
 
+def _get_current_platform(ctx):
+    os_name = ctx.os.name
+    os_name_lower = os_name.lower()
+    platform = "unknown"
+
+    if "windows" in os_name_lower:
+        platform = "windows"
+    elif "mac" in os_name_lower or "darwin" in os_name_lower:
+        platform = "macos"
+    elif "linux" in os_name_lower:
+        platform = "linux"
+    elif "freebsd" in os_name_lower:
+        platform = "freebsd"
+    return platform
+
 def _pkg_config_impl(ctx):
+    os_name = _get_current_platform(ctx)
+    if os_name in ctx.attr.skip_platforms:
+        ctx.file("BUILD", "# Skipped on platform {} by rule configuration".format(os_name))
+        # If we should not build on current platform, then the procedure finishes here.
+        # We would consider this as successful.
+        return _success(None)
+
     pkg_name = ctx.attr.pkg_name
     if pkg_name == "":
         pkg_name = ctx.attr.name
@@ -191,6 +213,7 @@ _pkg_config_repository = repository_rule(
         "linkopts": attr.string_list(doc = "Extra linkopts value."),
         "copts": attr.string_list(doc = "Extra copts value."),
         "ignore_opts": attr.string_list(doc = "Ignore listed opts in copts or linkopts."),
+        "skip_platforms": attr.string_list(default = [], doc = "Platforms to skip (currently supports 'windows', 'linux', 'mac', 'darwin', and 'freebsd')",)
     },
     local = True,
     implementation = _pkg_config_impl,
@@ -216,6 +239,7 @@ def _pkg_config_extension_impl(module_ctx):
                 linkopts = tag.linkopts,
                 copts = tag.copts,
                 ignore_opts = tag.ignore_opts,
+                skip_platforms = tag.skip_platforms,
             )
 
 pkg_config_extension = module_extension(
@@ -233,6 +257,7 @@ pkg_config_extension = module_extension(
             "linkopts": attr.string_list(default = []),
             "copts": attr.string_list(default = []),
             "ignore_opts": attr.string_list(default = []),
+            "skip_platforms": attr.string_list(default = []),
         }),
     }
 )
