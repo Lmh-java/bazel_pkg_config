@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> This Bazel rule repo is currently still under development and testing (July 17, 2025).
+
 # bazel_pkg_config
 
 Bazel rules for pkg-config tools.
