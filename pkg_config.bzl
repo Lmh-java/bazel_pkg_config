@@ -26,7 +26,6 @@ def _pkg_config(ctx, pkg_config, pkg_name, args):
 
 def _check(ctx, pkg_config, pkg_name):
     exist = _pkg_config(ctx, pkg_config, pkg_name, ["--exists"])
-    print(exist)
     if exist.error != None:
         return _error("Package {} does not exist".format(pkg_name))
 
@@ -64,7 +63,6 @@ def _includes(ctx, pkg_config, pkg_name):
     if includes.error != None:
         return includes
     includes, unused = _extract_prefix(includes.value, "-I", strip = True)
-    print("Get all the includes")
     return _success(includes)
 
 def _copts(ctx, pkg_config, pkg_name):
@@ -137,13 +135,15 @@ def _get_current_platform(ctx):
 
 def _pkg_config_impl(ctx):
     os_name = _get_current_platform(ctx)
+    pkg_name = ctx.attr.pkg_name
     if os_name in ctx.attr.skip_platforms:
         ctx.file("BUILD", "# Skipped on platform {} by rule configuration".format(os_name))
         # If we should not build on current platform, then the procedure finishes here.
         # We would consider this as successful.
+        message_string = "Local lib '{}' skipped on platform {} by rule configuration".format(pkg_name, os_name)
+        print(message_string)
         return _success(None)
 
-    pkg_name = ctx.attr.pkg_name
     if pkg_name == "":
         pkg_name = ctx.attr.name
 
@@ -224,9 +224,7 @@ pkg_config_repository = _pkg_config_repository
 
 def _pkg_config_extension_impl(module_ctx):
     for module in module_ctx.modules:
-        print("module")
         for tag in module.tags.package:
-            print("tag")
             _pkg_config_repository(
                 name = tag.name,
                 pkg_name = tag.pkg_name,
