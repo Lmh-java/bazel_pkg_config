@@ -1,14 +1,15 @@
 # vi: ft=bzl
 # Skipped on platform %{platform} by rule configuration
 
-filegroup(
-    name = "internal_lib",
+cc_library(
+    name = "lib",
     srcs = [],
+    hdrs = [],
     visibility = ["//visibility:public"],
 )
 
-filegroup(
-    name = "lib",
+cc_library(
+    name = "internal_lib",
     srcs = [],
     visibility = ["//visibility:public"],
 )
