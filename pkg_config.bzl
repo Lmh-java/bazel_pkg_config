@@ -137,7 +137,9 @@ def _pkg_config_impl(ctx):
     os_name = _get_current_platform(ctx)
     pkg_name = ctx.attr.pkg_name
     if os_name in ctx.attr.skip_platforms:
-        ctx.file("BUILD", "# Skipped on platform {} by rule configuration".format(os_name))
+        ctx.template("BUILD", Label("//:BUILD.empty.tmpl"), substitutions = {
+            "%{platform}": os_name,
+        }, executable = False)
         # If we should not build on current platform, then the procedure finishes here.
         # We would consider this as successful.
         message_string = "Local lib '{}' skipped on platform {} by rule configuration".format(pkg_name, os_name)
