@@ -48,7 +48,7 @@ cc_library(
 
 ### WORKSPACE
 > [!IMPORTANT]  
-> WORKSPACE will be completed removed in Bazel 9 (See [Bazel Roadmap](https://bazel.build/about/roadmap#full_transition_to_bzlmod))
+> WORKSPACE will be completely removed in Bazel 9 (See [Bazel Roadmap](https://bazel.build/about/roadmap#full_transition_to_bzlmod))
 > Please consider migrating to Bzlmod.
 
 Add the following in your `WORKSPACE`:
