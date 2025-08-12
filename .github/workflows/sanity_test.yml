@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 'v*.*.*'
+      - lmh/test-workflows # TODO: remove testing once done
 
 jobs:
   build:
