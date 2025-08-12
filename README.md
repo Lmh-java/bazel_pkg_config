@@ -3,7 +3,7 @@
 
 # bazel_pkg_config
 
-Bazel rules for pkg-config tools with Bazel 8+ (Bzlmod) support and backward compatibility Bazel < 8 (WORKSPACE).
+Bazel rules for pkg-config tools with Bazel 8+ (Bzlmod) support and backward compatibility Bazel < 8 (WORKSPACE).  
 Forked from cherrry/bazel_pkg_config with Bazel 8+ specific modifications.
 
 ## Usage
@@ -54,16 +54,18 @@ cc_library(
 Add the following in your `WORKSPACE`:
 
 ```bzl
-http_archive(
+git_repository(
     name = "bazel_pkg_config",
-    strip_prefix = "bazel_pkg_config-master",
-    urls = ["https://github.com/cherrry/bazel_pkg_config/archive/master.zip"],
+    remote = "https://github.com/Lmh-java/bazel_pkg_config.git",
+    # Replace with the lastest commit hash
+    commit = "e247fb3b4007e63bb5110808df6e2c57eb518f16",
 )
 
-load("@bazel_pkg_config//:pkg_config.bzl", "pkg_config")
+load("@bazel_pkg_config//:pkg_config.bzl", "pkg_config_repository")
 
-pkg_config(
-    name = "library_to_load",
+pkg_config_repository(
+    name = "target_name",
+    pkg_name = "library_to_load"
     # See pkg_config.bzl for more available options.
 )
 ```
