@@ -1,0 +1,37 @@
+name: Sanity Test
+
+on:
+  push:
+    branches:
+      - main
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+
+      - name: Checkout Test Case Repo
+        uses: actions/checkout@v4
+        with:
+          repository: Lmh-java/bazel_pkg_config_test
+
+      - name: Update Commit Hash in Test Cases
+        run: |
+          chmod +x ./update_commit_hash.sh
+          ./update_commit_hash.sh ${{ github.sha }}
+
+      - name: Run WORKSPACE Test Case
+        working-directory: ./workspace_test
+        run: |
+          bazel run //:main
+
+      - name: Run BzlMod Test Case
+        working-directory: ./bzlmod_test
+        run: |
+          bazel run //:main
