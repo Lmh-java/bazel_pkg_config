@@ -11,6 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
+      - name: Setup Ubuntu Native Libs
+        run: |
+          sudo apt update
+          sudo apt install libglib2.0-dev
+
       - name: Setup Bazel
         uses: bazel-contrib/setup-bazel@0.15.0
         with:
